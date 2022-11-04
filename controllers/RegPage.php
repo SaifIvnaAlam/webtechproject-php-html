@@ -10,27 +10,53 @@
 <h1>REGISTRATION PAGE</h1>
 
 	<?php 
-
+		define("filepath", "../data/user.json");		
+		$flag = false;
 		if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
+			if(empty($_POST['fname'])){
+				echo "Field can' be empty";
+				$flag = true;
+			}
+			if(empty($_POST['lname'])){
+				echo "Field can' be empty";
+					$flag = true;
+			}
+			if(empty($_POST['email'])){
+				$lnameError = "Field can' be empty";
+					$flag = true;
+			}
+			if(empty($_POST['password'])){
+				echo "Field can' be empty";
+					$flag = true;
+			}
+			if(!$flag){
 			$firstname = sanitize($_POST['fname']);
 			$lastname = sanitize($_POST['lname']);
 			$password = sanitize($_POST['password']);
 			$email = sanitize($_POST['email']);
 
-			if (empty($firstname) or empty($lastname) ) {
-				echo "Please fill up the form properly";
+				$fileData = read();
+				if(empty($fileData))
+				{
+					$data[]=array("firstname" => $firstname, "lastname" => $lastname, "email" => $email, "password"=>$password );
+				}
+				else{
+					$data = json_decode($fileData);
+					array_push($data, array("firstname" => $firstname, "lastname" => $lastname, "email" => $email, "password"=>$password ));
+				}
+				$data_encode = json_encode($data);
+				write("");
+				$res = write($data_encode);
+				if ($res) {
+					echo "Registration Done Successfully";
+				}
+				else{
+					echo "Registration Failed";
+				}
 			}
-			else {
-				$filename = "../data/user.json";
-				$file = fopen($filename, "w+");
-				$data = array("firstname" => $firstname, "lastname" => $lastname, "email" => $email, "password"=>$password );
-				$data = json_encode($data);
-				fwrite($file, $data);
-				fclose($file);
-
-				echo "Data Saved Successfully";
 			}
-		}
+		
 
 		function sanitize($data) {
 			$data = trim($data);
@@ -38,6 +64,23 @@
 			$data = htmlspecialchars($data);
 			return $data;
 		}
+
+		function write($content) {
+			$file = fopen(filepath, "w");
+			$fw = fwrite($file, $content . "\n");
+			fclose($file);
+			return $fw;
+			}
+			function read() {
+				$file = fopen(filepath, "r");
+				$fz = filesize(filepath);
+				$fr = "";
+				if($fz > 0) {
+				$fr = fread($file, $fz);
+				}
+				fclose($file);
+				return $fr;
+				}
 	?>
 
 	<br><br>
