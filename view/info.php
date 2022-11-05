@@ -7,6 +7,11 @@
     <title>Home page</title>
 </head>
 <body>
-    
+    <?php
+    session_start();
+    echo "Welcome" . " " .$_SESSION['email']; 
+    ?>
+    <br>
+    <a href="../controllers/logout.php">Logout</a>
 </body>
 </html>
